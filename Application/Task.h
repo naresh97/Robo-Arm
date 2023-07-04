@@ -16,11 +16,11 @@ namespace Application {
 
   public:
     Task(void (*taskHandler)(void *), std::string taskName, void *taskParameters = nullptr);
-    ~Task();
     void setTaskParameters(void *pTaskParameters);
     void run();
-    void dispose();
     void suspend();
     void resume();
+    static void delay(int ticks);
+    static void dispose();
   };
 }// namespace Application

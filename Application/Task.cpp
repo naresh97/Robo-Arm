@@ -22,16 +22,16 @@ namespace Application {
   void Task::setTaskParameters(void *pTaskParameters) {
     this->taskParameters = pTaskParameters;
   }
-  void Task::dispose() {
-    if (this->taskHandle != nullptr) vTaskDelete(this->taskHandle);
-  }
   void Task::suspend() {
     if (this->taskHandle != nullptr) vTaskSuspend(this->taskHandle);
   }
   void Task::resume() {
     if (this->taskHandle != nullptr) vTaskResume(this->taskHandle);
   }
-  Task::~Task() {
-    this->dispose();
+  void Task::delay(int ticks) {
+    vTaskDelay(ticks);
+  }
+  void Task::dispose() {
+    vTaskDelete(nullptr);
   }
 }// namespace Application
