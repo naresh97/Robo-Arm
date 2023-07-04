@@ -16,17 +16,17 @@ void Application_RunApplication() {
           Task{[](void *param) {
                  auto *servoParam = static_cast<ServoInfo *>(param);
                  if (servoParam == nullptr) Task::dispose();
-                 double &count = servoParam->currentAngle;
-                 int up = 1;
                  auto dutyCycleRange = Servo::DutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
                  auto servo = Servo{PWM::Timer::Timer2, PWM::Channel::Channel1, dutyCycleRange};
+
                  while (true) {
-                   servo.moveTo(count);
-                   Task::delay(10);
-                   count += up;
-                   if (count > 180) up = -1;
-                   else if (count < 0)
-                     up = 1;
+                   servo.moveTo(180, 90);
+                   Task::delay(180 / 90 * 1000);
+
+                   servo.moveTo(0, 360);
+                   Task::delay(180 / 360 * 1000);
+
+                   Task::delay(1000);
                  }
                  Task::dispose();
                },

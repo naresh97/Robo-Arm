@@ -49,7 +49,10 @@ namespace Application {
     vTaskDelete(nullptr);
   }
   Task::~Task() {
-    vTaskDelete(taskImpl->taskHandle);
+    if (taskImpl->taskHandle != nullptr) {
+      auto state = eTaskGetState(taskImpl->taskHandle);
+      if (state != eDeleted) vTaskDelete(taskImpl->taskHandle);
+    }
   }
   void Task::startScheduler() {
     vTaskStartScheduler();

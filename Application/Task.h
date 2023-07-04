@@ -15,7 +15,6 @@ namespace Application {
     void run();
     void suspend();
     void resume();
-
     static void delay(int ticks);
     static void dispose();
     static void startScheduler();
