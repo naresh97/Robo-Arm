@@ -18,10 +18,8 @@ void Application_RunApplication() {
                  if (servoParam == nullptr) Task::dispose();
                  double &count = servoParam->currentAngle;
                  int up = 1;
-                 double minPeriod = (0.43 / 20.0);
-                 double maxPeriod = (2.4 / 20.0);
-                 auto servo = Servo{PWM::Timer::Timer2, PWM::Channel::Channel1};
-                 servo.setDutyCycleRange(minPeriod, maxPeriod);
+                 auto dutyCycleRange = Servo::DutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
+                 auto servo = Servo{PWM::Timer::Timer2, PWM::Channel::Channel1, dutyCycleRange};
                  while (true) {
                    servo.moveTo(count);
                    Task::delay(10);
@@ -40,10 +38,8 @@ void Application_RunApplication() {
           [](void *param) {
             double count = 0;
             int up = 1;
-            double minPeriod = (0.43 / 20.0);
-            double maxPeriod = (2.4 / 20.0);
-            auto servo = Servo{PWM::Timer::Timer2, PWM::Channel::Channel2};
-            servo.setDutyCycleRange(minPeriod, maxPeriod);
+            auto dutyCycleRange = Servo::DutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
+            auto servo = Servo{PWM::Timer::Timer2, PWM::Channel::Channel2, dutyCycleRange};
             while (true) {
               servo.moveTo(count);
               Task::delay(5);
@@ -58,6 +54,5 @@ void Application_RunApplication() {
   );
   task2.setTaskParameters(&servoInfo);
   task2.run();
-
-  vTaskStartScheduler();
+  Task::startScheduler();
 }
