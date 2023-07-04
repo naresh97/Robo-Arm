@@ -53,11 +53,12 @@ include_directories(Core/Inc Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_
         ThirdParty/FreeRTOS
         ThirdParty/FreeRTOS/include
         ThirdParty/FreeRTOS/portable/GCC/ARM_CM4F
+        Application
         )
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F446xx)
 
-file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "ThirdParty/*.*")
+file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "ThirdParty/*.*" "Application/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F446RETX_FLASH.ld)
 
