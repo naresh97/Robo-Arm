@@ -5,6 +5,8 @@ extern "C" {
 #include "FreeRTOSConfig.h"
 }
 
+#include <algorithm>
+
 namespace Application::Hardware {
   Servo::Servo(PWM::Timer timer, PWM::Channel channel, DutyCycleRange dutyCycleRange)
       : timer(timer),
@@ -24,6 +26,7 @@ namespace Application::Hardware {
     );
   }
   void Servo::moveTo(double angle, double anglesPerSecond) {
+    angle = std::clamp(angle, 0.0, 180.0);
     servoTaskParameters.instance = this;
     servoTaskParameters.anglesPerTicks = anglesPerSecond / configTICK_RATE_HZ;
     servoTaskParameters.targetAngle = angle;
@@ -49,5 +52,8 @@ namespace Application::Hardware {
     int direction = 1;
     if (towards < currentAngle) direction = -1;
     this->moveTo(currentAngle + direction * amount);
+  }
+  double Servo::getCurrentAngle() const {
+    return this->currentAngle;
   }
 }// namespace Application::Hardware

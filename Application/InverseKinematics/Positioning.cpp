@@ -4,6 +4,11 @@
 #include <cmath>
 
 namespace Application::Kinematics {
+
+  static double toDegrees(double radians) {
+    return radians * 180 / M_PI;
+  }
+
   std::array<double, DegreesOfFreedom> Positioning::positionEffector() {
     std::array<double, DegreesOfFreedom> angles{};
 
@@ -21,9 +26,9 @@ namespace Application::Kinematics {
 
     auto q3 = desiredEffectorPosition[2] - q1 - q2;
 
-    angles[0] = q1;
-    angles[1] = q2;
-    angles[2] = q3;
+    angles[0] = toDegrees(q1);
+    angles[1] = toDegrees(q2);
+    angles[2] = toDegrees(q3);
 
     return angles;
   }
@@ -47,6 +52,24 @@ namespace Application::Kinematics {
   void Positioning::updateDesiredEffectorPosition(std::array<double, EffectorDimensions> positions
   ) {
     this->desiredEffectorPosition = positions;
+  }
+
+  static double remap(double value, double low1, double high1, double low2, double high2) {
+    return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
+  }
+
+  void Positioning::convertToWorldAngles(std::array<double, DegreesOfFreedom> &servoAngles) {
+    servoAngles[0] = remap(servoAngles[0], 0, 180, 180, 0);
+    servoAngles[1] = remap(servoAngles[1], -90, 90, 180, 0);
+    servoAngles[2] = remap(servoAngles[2], -90, 90, 180, 0);
+  }
+  void Positioning::convertToToolAngles(std::array<double, DegreesOfFreedom> &servoAngles) {
+    servoAngles[0] = remap(servoAngles[0], 180, 0, 0, 180);
+    servoAngles[1] = remap(servoAngles[1], 180, 0, -90, 90);
+    servoAngles[2] = remap(servoAngles[2], 180, 0, -90, 90);
+  }
+  Positioning::Positioning(const std::array<double, DegreesOfFreedom - 1> &linkLengths)
+      : linkLengths(linkLengths) {
   }
 
 }// namespace Application::Kinematics

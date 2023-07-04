@@ -30,5 +30,6 @@ namespace Application::Hardware {
     void moveBy(double amount, double towards);
     void moveTo(double angle);
     void moveTo(double angle, double anglesPerSecond);
+    [[nodiscard]] double getCurrentAngle() const;
   };
 }// namespace Application::Hardware
