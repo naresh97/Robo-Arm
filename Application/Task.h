@@ -8,7 +8,6 @@ extern "C" {
 }
 
 namespace Application {
-
   class Task {
     void (*taskHandler)(void *);
     const std::string taskName;
