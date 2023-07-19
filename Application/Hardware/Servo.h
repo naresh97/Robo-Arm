@@ -24,9 +24,14 @@ namespace Application::Hardware {
       double targetAngle{};
     } servoTaskParameters{};
     double currentAngle{};
+    double offsetAngle{};
+    bool inverted{false};
 
   public:
-    Servo(PWM::Timer timer, PWM::Channel channel, DutyCycleRange dutyCycleRange);
+    Servo(PWM::Timer timer, PWM::Channel channel, DutyCycleRange dutyCycleRange,
+          double initialAngle = 0);
+    void setOffset(double offset);
+    void setInverted(bool inverted);
     void moveBy(double amount, double towards);
     void moveTo(double angle);
     void moveTo(double angle, double anglesPerSecond);

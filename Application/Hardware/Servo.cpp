@@ -8,16 +8,22 @@ extern "C" {
 #include <algorithm>
 
 namespace Application::Hardware {
-  Servo::Servo(PWM::Timer timer, PWM::Channel channel, DutyCycleRange dutyCycleRange)
+  Servo::Servo(
+          PWM::Timer timer, PWM::Channel channel, DutyCycleRange dutyCycleRange, double initialAngle
+  )
       : timer(timer),
         channel(channel),
-        dutyCycleRange(dutyCycleRange) {
+        dutyCycleRange(dutyCycleRange),
+        currentAngle(initialAngle) {
     PWM::startPWM(timer, channel);
     moveTo(currentAngle);
     Task::delay(500);
   }
   void Servo::moveTo(double angle) {
     currentAngle = angle;
+    angle = angle - offsetAngle;
+    if (inverted) angle = 180.0 - angle;
+
     PWM::setDutyCycle(
             timer,
             channel,
@@ -54,6 +60,12 @@ namespace Application::Hardware {
     this->moveTo(currentAngle + direction * amount);
   }
   double Servo::getCurrentAngle() const {
-    return this->currentAngle;
+    return currentAngle;
+  }
+  void Servo::setOffset(double offset) {
+    this->offsetAngle = offset;
+  }
+  void Servo::setInverted(bool inverted) {
+    this->inverted = inverted;
   }
 }// namespace Application::Hardware
