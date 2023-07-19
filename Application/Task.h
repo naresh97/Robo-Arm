@@ -1,12 +1,15 @@
 #pragma once
 
+#include <any>
 #include <memory>
 #include <string>
 
 namespace Application {
-  class TaskImpl;
   class Task {
-    std::unique_ptr<TaskImpl> taskImpl;
+    void (*taskHandler)(void *){};
+    std::string taskName{};
+    void *taskHandle{nullptr};
+    void *taskParameters{};
 
   public:
     Task(void (*taskHandler)(void *), std::string taskName, void *taskParameters = nullptr);

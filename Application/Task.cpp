@@ -9,38 +9,31 @@ extern "C" {
 
 namespace Application {
 
-  struct TaskImpl {
-    void (*taskHandler)(void *){};
-    std::string taskName{};
-    TaskHandle_t taskHandle{nullptr};
-    void *taskParameters{};
-  };
-
   Task::Task(void (*taskHandler)(void *), std::string taskName, void *const taskParameters)
-      : taskImpl(std::make_unique<TaskImpl>()) {
-    taskImpl->taskHandler = taskHandler;
-    taskImpl->taskName = std::move(taskName);
-    taskImpl->taskParameters = taskParameters;
+      : taskHandler(taskHandler),
+        taskName(std::move(taskName)),
+        taskParameters(taskParameters) {
   }
+
   void Task::run() {
     auto status = xTaskCreate(
-            taskImpl->taskHandler,
-            taskImpl->taskName.c_str(),
+            taskHandler,
+            taskName.c_str(),
             200,
-            taskImpl->taskParameters,
+            taskParameters,
             2,
-            &(taskImpl->taskHandle)
+            reinterpret_cast<TaskHandle_t *>(&taskHandle)
     );
     configASSERT(status == pdPASS);
   }
   void Task::setTaskParameters(void *pTaskParameters) {
-    taskImpl->taskParameters = pTaskParameters;
+    taskParameters = pTaskParameters;
   }
   void Task::suspend() {
-    if (taskImpl->taskHandle != nullptr) vTaskSuspend(taskImpl->taskHandle);
+    if (taskHandle != nullptr) vTaskSuspend(static_cast<TaskHandle_t>(taskHandle));
   }
   void Task::resume() {
-    if (taskImpl->taskHandle != nullptr) vTaskResume(taskImpl->taskHandle);
+    if ((TaskHandle_t) taskHandle != nullptr) vTaskResume(static_cast<TaskHandle_t>(taskHandle));
   }
   void Task::delay(int ticks) {
     vTaskDelay(ticks);
@@ -49,9 +42,9 @@ namespace Application {
     vTaskDelete(nullptr);
   }
   Task::~Task() {
-    if (taskImpl->taskHandle != nullptr) {
-      auto state = eTaskGetState(taskImpl->taskHandle);
-      if (state != eDeleted) vTaskDelete(taskImpl->taskHandle);
+    if ((TaskHandle_t) taskHandle != nullptr) {
+      auto state = eTaskGetState(static_cast<TaskHandle_t>(taskHandle));
+      if (state != eDeleted) vTaskDelete(static_cast<TaskHandle_t>(taskHandle));
     }
   }
   void Task::startScheduler() {
