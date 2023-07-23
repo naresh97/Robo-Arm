@@ -5,7 +5,7 @@ extern "C" {
 #include "task.h"
 }
 
-namespace Application::TaskUtils {
+namespace Application::OS::TaskUtils {
   void dispose() {
     vTaskDelete(nullptr);
   }
@@ -15,4 +15,4 @@ namespace Application::TaskUtils {
   void startScheduler() {
     vTaskStartScheduler();
   }
-}// namespace Application::TaskUtils
+}// namespace Application::OS::TaskUtils

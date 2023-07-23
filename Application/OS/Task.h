@@ -12,7 +12,7 @@ extern "C" {
 #include "task.h"
 }
 
-namespace Application {
+namespace Application::OS {
   template<typename TFunction, typename... TArgs>
     requires std::is_invocable_v<TFunction, TArgs &...>
   class Task {
@@ -75,4 +75,4 @@ namespace Application {
       taskState = TaskState::Running;
     }
   };
-}// namespace Application
+}// namespace Application::OS
