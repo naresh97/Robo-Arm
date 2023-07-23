@@ -25,7 +25,6 @@ namespace Application {
     enum class TaskState { Uninitialized, Running, Suspended };
 
   private:
-    std::string_view taskName;
     StaticTask_t taskControlBlock{};
     TaskHandle_t taskHandle{nullptr};
     std::array<StackType_t, TaskStackSize> taskStack{};
@@ -50,16 +49,15 @@ namespace Application {
     };
 
   public:
-    constexpr Task(std::string_view taskName, TFunction &&function, TArgs &...args)
-        : taskName(taskName),
-          internalParam{taskState, function, {args...}} {};
+    constexpr Task(TFunction &&function, TArgs &...args)
+        : internalParam{taskState, function, {args...}} {};
     void run() {
       if (taskHandle != nullptr && taskState != TaskState::Uninitialized) {
         vTaskDelete(taskHandle);
       }
       taskHandle = xTaskCreateStatic(
               internalTaskHandler,
-              taskName.data(),
+              "",
               TaskStackSize,
               &internalParam,
               2,
