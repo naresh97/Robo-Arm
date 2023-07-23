@@ -9,6 +9,7 @@ void Application_RunApplication() {
   using namespace Application;
   using namespace Application::OS;
   using namespace Application::Hardware;
+  using namespace Application::Kinematics;
 
   static auto task1 = Task{[]() {
     auto dutyCycleRange = ServoData::DutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
@@ -21,7 +22,7 @@ void Application_RunApplication() {
     static auto servo1control = ServoControl{servo1};
     static auto servo2control = ServoControl{servo2};
     static auto servo3control = ServoControl{servo3};
-    Kinematics::Positioning positioning{{100, 100}};
+    Kinematics::Positioning::LinkLengthsArray linkLengths{100, 100};
     TaskUtils::delay(2000);
 
     double c = 0;
@@ -32,10 +33,8 @@ void Application_RunApplication() {
       if (c > 50 || c < -50) { i = -i; }
       auto x = std::array{servo1.currentAngle, servo2.currentAngle, servo3.currentAngle};
       Kinematics::Positioning::convertToWorldAngles(x);
-      positioning.updateActuatorPositions(x);
       auto targetPosition = std::array{c, 150., 3.14 / 2.};
-      positioning.updateDesiredEffectorPosition(targetPosition);
-      auto newX = positioning.positionEffector();
+      auto newX = Positioning::positionEffector(linkLengths, targetPosition);
       Kinematics::Positioning::convertToToolAngles(newX);
       servo1control.moveTo(newX[0], 45);
       servo2control.moveTo(newX[1], 45);
