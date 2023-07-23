@@ -70,7 +70,7 @@ namespace Application::OS {
       if (taskHandle != nullptr) vTaskSuspend(taskHandle);
       taskState = TaskState::Suspended;
     }
-    void resume() const {
+    void resume() {
       if (taskHandle != nullptr) vTaskResume(taskHandle);
       taskState = TaskState::Running;
     }

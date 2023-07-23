@@ -15,4 +15,7 @@ namespace Application::OS::TaskUtils {
   void startScheduler() {
     vTaskStartScheduler();
   }
+  void suspend() {
+    vTaskSuspend(nullptr);
+  }
 }// namespace Application::OS::TaskUtils
