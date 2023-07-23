@@ -71,8 +71,12 @@ namespace Application::OS {
       taskState = TaskState::Suspended;
     }
     void resume() {
-      if (taskHandle != nullptr) vTaskResume(taskHandle);
-      taskState = TaskState::Running;
+      if (taskHandle == nullptr || taskState == TaskState::Uninitialized) {
+        run();
+      } else {
+        vTaskResume(taskHandle);
+        taskState = TaskState::Running;
+      }
     }
   };
 }// namespace Application::OS
