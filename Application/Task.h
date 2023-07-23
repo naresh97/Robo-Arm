@@ -16,6 +16,8 @@ namespace Application {
   template<typename TFunction, typename... TArgs>
     requires std::is_invocable_v<TFunction, TArgs &...>
   class Task {
+    static constexpr auto TaskStackSize = 200;
+
   public:
     using tuple_type = std::tuple<TArgs &...>;
     using function_type = TFunction;
@@ -24,7 +26,9 @@ namespace Application {
 
   private:
     std::string_view taskName;
+    StaticTask_t taskControlBlock{};
     TaskHandle_t taskHandle{nullptr};
+    std::array<StackType_t, TaskStackSize> taskStack{};
     TaskState taskState{TaskState::Uninitialized};
 
     struct InternalParam {
@@ -53,15 +57,16 @@ namespace Application {
       if (taskHandle != nullptr && taskState != TaskState::Uninitialized) {
         vTaskDelete(taskHandle);
       }
-      auto status = xTaskCreate(
+      taskHandle = xTaskCreateStatic(
               internalTaskHandler,
               taskName.data(),
-              200,
+              TaskStackSize,
               &internalParam,
               2,
-              &taskHandle
+              &taskStack[0],
+              &taskControlBlock
       );
-      configASSERT(status == pdPASS);
+      configASSERT(taskHandle != nullptr);
     }
     void suspend() {
       if (taskHandle != nullptr) vTaskSuspend(taskHandle);
