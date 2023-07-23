@@ -5,7 +5,6 @@
 #include <algorithm>
 
 extern "C" {
-#include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 }
 

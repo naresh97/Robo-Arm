@@ -16,4 +16,4 @@ namespace Application::Kinematics::Positioning {
   );
   void convertToWorldAngles(std::array<double, DegreesOfFreedom> &servoAngles);
   void convertToToolAngles(std::array<double, DegreesOfFreedom> &servoAngles);
-};// namespace Application::Kinematics::Positioning
+}// namespace Application::Kinematics::Positioning

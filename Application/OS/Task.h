@@ -49,7 +49,7 @@ namespace Application::OS {
     };
 
   public:
-    constexpr Task(TFunction &&function, TArgs &...args)
+    constexpr explicit Task(TFunction &&function, TArgs &...args)
         : internalParam{taskState, function, {args...}} {};
     void run() {
       if (taskHandle != nullptr && taskState != TaskState::Uninitialized) {
@@ -64,7 +64,7 @@ namespace Application::OS {
               &taskStack[0],
               &taskControlBlock
       );
-      configASSERT(taskHandle != nullptr);
+      configASSERT(taskHandle != nullptr)
     }
     void suspend() {
       if (taskHandle != nullptr) vTaskSuspend(taskHandle);
