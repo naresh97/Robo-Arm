@@ -1,59 +1,48 @@
 #include "Application.h"
 
-#include "Hardware/PWM.h"
-#include "Hardware/Servo.h"
+#include "Hardware/ServoControl.h"
+#include "Hardware/ServoData.h"
 #include "InverseKinematics/Positioning.h"
-#include "Task.h"
-
-struct Task1Parameters {
-  std::array<double, Application::Kinematics::EffectorDimensions> targetPosition{};
-} task1Parameters{};
+#include "OS/Task.h"
 
 void Application_RunApplication() {
   using namespace Application;
+  using namespace Application::OS;
   using namespace Application::Hardware;
 
-  auto task1 =
-          Task{[](void *param) {
-                 auto dutyCycleRange = Servo::DutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
+  static auto task1 = Task{[]() {
+    auto dutyCycleRange = ServoData::DutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
+    static auto servo1 =
+            ServoData{PWM::Timer::Timer2, PWM::Channel::Channel2, dutyCycleRange, 90, -7};
+    static auto servo2 =
+            ServoData{PWM::Timer::Timer2, PWM::Channel::Channel1, dutyCycleRange, 90, -10, true};
+    static auto servo3 =
+            ServoData{PWM::Timer::Timer2, PWM::Channel::Channel3, dutyCycleRange, 90, 5};
+    static auto servo1control = ServoControl{servo1};
+    static auto servo2control = ServoControl{servo2};
+    static auto servo3control = ServoControl{servo3};
+    Kinematics::Positioning positioning{{100, 100}};
+    TaskUtils::delay(2000);
 
-                 auto servo1 = Servo{PWM::Timer::Timer2, PWM::Channel::Channel1, dutyCycleRange};
-                 auto servo2 = Servo{PWM::Timer::Timer2, PWM::Channel::Channel2, dutyCycleRange};
-                 auto servo3 = Servo{PWM::Timer::Timer2, PWM::Channel::Channel3, dutyCycleRange};
-                 Kinematics::Positioning positioning{{100, 100}};
-                 while (true) {
-                   task1Parameters.targetPosition[0] += 0;
-                   task1Parameters.targetPosition[1] += 20;
-                   task1Parameters.targetPosition[2] += 0;
-                   task1Parameters.targetPosition[0] = task1Parameters.targetPosition[0] > 1000
-                                                               ? 0
-                                                               : task1Parameters.targetPosition[0];
-                   task1Parameters.targetPosition[1] = task1Parameters.targetPosition[0] > 1000
-                                                               ? 0
-                                                               : task1Parameters.targetPosition[1];
-                   task1Parameters.targetPosition[2] = task1Parameters.targetPosition[0] > 180
-                                                               ? 0
-                                                               : task1Parameters.targetPosition[2];
+    double c = 0;
+    double i = 5;
 
-                   std::array<double, Kinematics::DegreesOfFreedom> x = {
-                           servo1.getCurrentAngle(),
-                           servo2.getCurrentAngle(),
-                           servo3.getCurrentAngle()};
-                   Kinematics::Positioning::convertToWorldAngles(x);
-                   positioning.updateActuatorPositions(x);
-                   positioning.updateDesiredEffectorPosition(task1Parameters.targetPosition);
-                   auto newX = positioning.positionEffector();
-                   Kinematics::Positioning::convertToToolAngles(newX);
-                   servo1.moveTo(newX[0], 180);
-                   servo2.moveTo(newX[1], 180);
-                   servo3.moveTo(newX[2], 180);
-                   Task::delay(1000);
-                 }
-                 Task::dispose();
-               },
-               "task1",
-               nullptr};
+    while (true) {
+      c += i;
+      if (c > 50 || c < -50) { i = -i; }
+      auto x = std::array{servo1.currentAngle, servo2.currentAngle, servo3.currentAngle};
+      Kinematics::Positioning::convertToWorldAngles(x);
+      positioning.updateActuatorPositions(x);
+      auto targetPosition = std::array{c, 150., 3.14 / 2.};
+      positioning.updateDesiredEffectorPosition(targetPosition);
+      auto newX = positioning.positionEffector();
+      Kinematics::Positioning::convertToToolAngles(newX);
+      servo1control.moveTo(newX[0], 45);
+      servo2control.moveTo(newX[1], 45);
+      servo3control.moveTo(newX[2], 45);
+      TaskUtils::delay(500);
+    }
+  }};
   task1.run();
-
-  Task::startScheduler();
+  TaskUtils::startScheduler();
 }
