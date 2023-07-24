@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace Application::Kinematics::Positioning {
+namespace Application::Kinematics::Positioning2D {
 
   static double toDegrees(double radians) {
     return radians * 180 / M_PI;
@@ -65,4 +65,4 @@ namespace Application::Kinematics::Positioning {
     servoAngles[2] = remap(servoAngles[2], 180, 0, -90, 90);
   }
 
-}// namespace Application::Kinematics::Positioning
+}// namespace Application::Kinematics::Positioning2D

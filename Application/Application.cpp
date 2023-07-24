@@ -22,7 +22,7 @@ void Application_RunApplication() {
     static auto servo1control = ServoControl{servo1};
     static auto servo2control = ServoControl{servo2};
     static auto servo3control = ServoControl{servo3};
-    Kinematics::Positioning::LinkLengthsArray linkLengths{100, 100};
+    Kinematics::Positioning2D::LinkLengthsArray linkLengths{100, 100};
     TaskUtils::delay(2000);
 
     double c = 0;
@@ -32,10 +32,10 @@ void Application_RunApplication() {
       c += i;
       if (c > 50 || c < -50) { i = -i; }
       auto x = std::array{servo1.currentAngle, servo2.currentAngle, servo3.currentAngle};
-      Kinematics::Positioning::convertToWorldAngles(x);
+      Kinematics::Positioning2D::convertToWorldAngles(x);
       auto targetPosition = std::array{c, 150., 3.14 / 2.};
-      auto newX = Positioning::positionEffector(linkLengths, targetPosition);
-      Kinematics::Positioning::convertToToolAngles(newX);
+      auto newX = Positioning2D::positionEffector(linkLengths, targetPosition);
+      Kinematics::Positioning2D::convertToToolAngles(newX);
       servo1control.moveTo(newX[0], 45);
       servo2control.moveTo(newX[1], 45);
       servo3control.moveTo(newX[2], 45);

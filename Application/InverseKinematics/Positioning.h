@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-namespace Application::Kinematics::Positioning {
+namespace Application::Kinematics::Positioning2D {
   static constexpr int EffectorDimensions = 3;// Planar - X,Y,A
   static constexpr int DegreesOfFreedom = 3;
   using ActuatorPositionArray = std::array<double, DegreesOfFreedom>;
@@ -16,4 +16,4 @@ namespace Application::Kinematics::Positioning {
   );
   void convertToWorldAngles(std::array<double, DegreesOfFreedom> &servoAngles);
   void convertToToolAngles(std::array<double, DegreesOfFreedom> &servoAngles);
-}// namespace Application::Kinematics::Positioning
+}// namespace Application::Kinematics::Positioning2D
