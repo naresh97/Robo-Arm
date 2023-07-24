@@ -21,8 +21,8 @@ namespace Application::Hardware {
   }
 
   template<ServoTypes::ServoType TServoType>
-  ServoControl<TServoType>::ServoControl(ServoData<TServoType> &servoData)
-      : servoData(servoData),
+  ServoControl<TServoType>::ServoControl(ServoData<TServoType> servoData)
+      : servoData(std::move(servoData)),
         controlTaskParameters(servoData, *this),
         controlTask{servoControlTask, controlTaskParameters} {
     PWM::startPWM(servoData.timer, servoData.channel);

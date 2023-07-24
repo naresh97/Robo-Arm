@@ -16,13 +16,13 @@ namespace Application::Hardware {
     };
 
   private:
-    ServoData<TServoType> &servoData;
+    ServoData<TServoType> servoData;
     ControlTaskParameters controlTaskParameters;
     OS::Task<void (*)(ControlTaskParameters &), ControlTaskParameters &> controlTask;
     static void servoControlTask(ControlTaskParameters &controlTaskParameters);
 
   public:
-    explicit ServoControl(ServoData<TServoType> &servoData);
+    explicit ServoControl(ServoData<TServoType> servoData);
     void moveBy(double amount, double towards);
     void moveTo(double angle);
     void moveTo(double angle, double anglesPerSecond);
