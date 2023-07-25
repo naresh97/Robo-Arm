@@ -3,7 +3,9 @@
 namespace Application::Controllers {
   auto createServoControls(auto &servoData) {
     return std::apply(
-            [](auto &...datas) { return std::tuple{Hardware::ServoControl{datas}...}; },
+            [](auto &...datas) {
+              return std::tuple{Hardware::ServoControl{datas}...};
+            },
             servoData
     );
   }

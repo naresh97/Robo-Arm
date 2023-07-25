@@ -67,7 +67,8 @@ namespace Application::OS {
       configASSERT(taskHandle != nullptr)
     }
     void suspend() {
-      if (taskHandle != nullptr) vTaskSuspend(taskHandle);
+      if (taskHandle != nullptr)
+        vTaskSuspend(taskHandle);
       taskState = TaskState::Suspended;
     }
     void resume() {

@@ -9,10 +9,12 @@ namespace Application::Kinematics::Positioning2D {
   using EffectorPositionArray = std::array<double, EffectorDimensions>;
 
   std::array<double, EffectorDimensions> getEffectorPosition(
-          LinkLengthsArray &linkLengths, ActuatorPositionArray &actuatorPositions
+          LinkLengthsArray &linkLengths,
+          ActuatorPositionArray &actuatorPositions
   );
   std::array<double, DegreesOfFreedom> positionEffector(
-          LinkLengthsArray &linkLengths, EffectorPositionArray &desiredEffectorPosition
+          LinkLengthsArray &linkLengths,
+          EffectorPositionArray &desiredEffectorPosition
   );
   void convertToWorldAngles(std::array<double, DegreesOfFreedom> &servoAngles);
   void convertToToolAngles(std::array<double, DegreesOfFreedom> &servoAngles);

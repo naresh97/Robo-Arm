@@ -13,7 +13,8 @@ namespace Application::Controllers {
     std::tuple<TServoDatas...> servoData;
     Kinematics::Positioning2D::LinkLengthsArray linkLengths;
     explicit ArmData(
-            Kinematics::Positioning2D::LinkLengthsArray linkLengths, TServoDatas... servoDatas
+            Kinematics::Positioning2D::LinkLengthsArray linkLengths,
+            TServoDatas... servoDatas
     )
         : servoData{std::move(servoDatas)...},
           linkLengths(linkLengths){};

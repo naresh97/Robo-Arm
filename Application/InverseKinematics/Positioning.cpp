@@ -10,18 +10,19 @@ namespace Application::Kinematics::Positioning2D {
   }
 
   std::array<double, DegreesOfFreedom> positionEffector(
-          LinkLengthsArray &linkLengths, EffectorPositionArray &desiredEffectorPosition
+          LinkLengthsArray &linkLengths,
+          EffectorPositionArray &desiredEffectorPosition
   ) {
     std::array<double, DegreesOfFreedom> angles{};
 
-    auto q2 = (std::pow(desiredEffectorPosition[0], 2) + std::pow(desiredEffectorPosition[1], 2) -
-               std::pow(linkLengths[0], 2) - std::pow(linkLengths[1], 2)) /
-              (2 * linkLengths[0] * linkLengths[1]);
+    auto q2 = (std::pow(desiredEffectorPosition[0], 2) + std::pow(desiredEffectorPosition[1], 2)
+               - std::pow(linkLengths[0], 2) - std::pow(linkLengths[1], 2))
+              / (2 * linkLengths[0] * linkLengths[1]);
     q2 = std::clamp(q2, -1.0, 1.0);
     q2 = std::acos(q2);
 
-    auto q1 = std::atan2(desiredEffectorPosition[1], desiredEffectorPosition[0]) -
-              std::atan2(
+    auto q1 = std::atan2(desiredEffectorPosition[1], desiredEffectorPosition[0])
+              - std::atan2(
                       linkLengths[0] * std::sin(q2),
                       linkLengths[0] + linkLengths[1] * std::cos(q2)
               );
@@ -36,14 +37,15 @@ namespace Application::Kinematics::Positioning2D {
   }
 
   std::array<double, EffectorDimensions> getEffectorPosition(
-          LinkLengthsArray &linkLengths, ActuatorPositionArray &actuatorPositions
+          LinkLengthsArray &linkLengths,
+          ActuatorPositionArray &actuatorPositions
   ) {
     std::array<double, EffectorDimensions> position{};
     auto phi = actuatorPositions[0] + actuatorPositions[1] + actuatorPositions[2];
-    auto x = linkLengths[0] * std::cos(actuatorPositions[0] + actuatorPositions[1]) +
-             linkLengths[1] * std::cos(linkLengths[0]);
-    auto y = linkLengths[0] * std::sin(actuatorPositions[0] + actuatorPositions[1]) +
-             linkLengths[1] * std::sin(linkLengths[0]);
+    auto x = linkLengths[0] * std::cos(actuatorPositions[0] + actuatorPositions[1])
+             + linkLengths[1] * std::cos(linkLengths[0]);
+    auto y = linkLengths[0] * std::sin(actuatorPositions[0] + actuatorPositions[1])
+             + linkLengths[1] * std::sin(linkLengths[0]);
     position[0] = x;
     position[1] = y;
     position[2] = phi;
