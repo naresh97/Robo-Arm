@@ -13,11 +13,11 @@ extern "C" {
 }
 
 namespace Application::OS {
-  template<typename TFunction, typename... TArgs>
+  static constexpr auto TaskTickRate = configTICK_RATE_HZ;
+
+  template<int TaskStackSize, typename TFunction, typename... TArgs>
     requires std::is_invocable_v<TFunction, TArgs &...>
   class Task {
-    static constexpr auto TaskStackSize = 200;
-
   public:
     using tuple_type = std::tuple<TArgs &...>;
     using function_type = TFunction;
@@ -29,6 +29,7 @@ namespace Application::OS {
     TaskHandle_t taskHandle{nullptr};
     std::array<StackType_t, TaskStackSize> taskStack{};
     TaskState taskState{TaskState::Uninitialized};
+    decltype(xTaskGetTickCount()) lastWakeTime{};
 
     struct InternalParam {
       TaskState &state;
@@ -50,7 +51,10 @@ namespace Application::OS {
 
   public:
     constexpr explicit Task(TFunction &&function, TArgs &...args)
-        : internalParam{taskState, function, {args...}} {};
+        : internalParam{taskState, function, {args...}} {
+      lastWakeTime = xTaskGetTickCount();
+    };
+
     void run() {
       if (taskHandle != nullptr && taskState != TaskState::Uninitialized) {
         vTaskDelete(taskHandle);
@@ -79,5 +83,7 @@ namespace Application::OS {
         taskState = TaskState::Running;
       }
     }
+    void clock(int tickPeriod) { vTaskDelayUntil(&lastWakeTime, tickPeriod); }
   };
+
 }// namespace Application::OS

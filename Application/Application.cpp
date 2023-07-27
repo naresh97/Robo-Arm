@@ -14,23 +14,33 @@ void Application_RunApplication() {
   using namespace Application::Kinematics;
   using namespace Application::Controllers;
 
-  static auto task1 = Task{[]() {
-    auto servo1 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel2, 90, -7};
-    auto servo2 =
-            ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel1, 90, -10, true};
-    auto servo3 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel3, 90, 5};
-    auto linkLengths = Kinematics::Positioning2D::LinkLengthsArray{100, 100};
-    auto armData = ArmData{linkLengths, servo1, servo2, servo3};
+  static auto task1 = Task<2000, void (*)()>{[]() {
+    auto createArmControl = []() {
+      auto servo1 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel2, 90, -7};
+      auto servo2 = ServoData<ServoTypes::SG90>{
+              PWM::Timer::Timer2,
+              PWM::Channel::Channel1,
+              90,
+              -10,
+              true};
+      auto servo3 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel3, 90, 5};
+      auto linkLengths = Kinematics::Positioning2D::LinkLengthsArray{100, 100};
+      auto armData = ArmData{linkLengths, servo1, servo2, servo3};
+      return ArmControl{armData};
+    };
+    
+    static auto armControl = createArmControl();
 
-    static auto armControl = ArmControl{armData};
     TaskUtils::delay(2000);
     double c = 0;
     double i = 5;
     while (true) {
       c += i;
-      if (c > 50 || c < -50) { i = -i; }
+      if (c > 50 || c < -50) {
+        i = -i;
+      }
       auto targetPosition = std::array{c, 150., 3.14 / 2.};
-      armControl.positionTo(targetPosition);
+      //armControl.positionTo(targetPosition);
       TaskUtils::delay(500);
     }
   }};
