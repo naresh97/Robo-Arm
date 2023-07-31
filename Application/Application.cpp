@@ -1,10 +1,8 @@
 #include "Application.h"
 
 #include "Controllers/ArmControl.h"
-#include "Controllers/ArmData.h"
-#include "Hardware/ServoControl.h"
+#include "Hardware/ServoController.h"
 #include "Hardware/ServoData.h"
-#include "InverseKinematics/Positioning.h"
 #include "OS/Task.h"
 
 void Application_RunApplication() {
@@ -14,34 +12,32 @@ void Application_RunApplication() {
   using namespace Application::Kinematics;
   using namespace Application::Controllers;
 
-  static auto task1 = Task<2000, void (*)()>{[]() {
-    auto createArmControl = []() {
-      auto servo1 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel2, 90, -7};
-      auto servo2 = ServoData<ServoTypes::SG90>{
-              PWM::Timer::Timer2,
-              PWM::Channel::Channel1,
-              90,
-              -10,
-              true};
-      auto servo3 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel3, 90, 5};
-      auto linkLengths = Kinematics::Positioning2D::LinkLengthsArray{100, 100};
-      auto armData = ArmData{linkLengths, servo1, servo2, servo3};
-      return ArmControl{armData};
-    };
-    
-    static auto armControl = createArmControl();
+  auto servo1 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel2, -5};
+  auto servo2 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel1, 0, true};
+  auto servo3 = ServoData<ServoTypes::SG90>{PWM::Timer::Timer2, PWM::Channel::Channel3, 5};
+  static auto controller = ServoController{servo1, servo2, servo3};
+  controller.run();
 
-    TaskUtils::delay(2000);
-    double c = 0;
-    double i = 5;
+  static auto task1 = Task<2000, void (*)()>{[]() {
+    TaskUtils::delay(1000);
+    //    controller.setTarget(0, 90, 45);
+    //    controller.setTarget(1, 90, 45);
+    controller.setTarget(2, 45, (90 - 45) / 0.25);
+    //    auto armControl = ArmControl{
+    //            controller,
+    //            {100, 100}
+    //    };
+
+    double c{};
+    double i{20};
     while (true) {
-      c += i;
-      if (c > 50 || c < -50) {
-        i = -i;
-      }
-      auto targetPosition = std::array{c, 150., 3.14 / 2.};
-      //armControl.positionTo(targetPosition);
-      TaskUtils::delay(500);
+      //      c += i;
+      //      if (c > 100 || c < -100) {
+      //        i = -i;
+      //      }
+      //      auto targetPosition = std::array{c, 150., 3.14 / 2.};
+      //      armControl.positionTo({c, 500., 3.14 / 2.});
+      TaskUtils::delay(100);
     }
   }};
   task1.run();
