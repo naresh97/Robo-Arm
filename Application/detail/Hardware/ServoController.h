@@ -1,11 +1,19 @@
 #pragma once
+#include "ServoUtil.h"
 namespace Application::Hardware {
 
-  static void controlServo(auto &servoTargeting) {
+  template<Hardware::IServoData... ServoData>
+  auto &ServoController<ServoData...>::getTask() {
+    return task;
+  }
+
+  static void controlServo(auto &servoTargeting, auto &servosRequiringTargeting) {
     static constexpr auto ANGLE_TOLERANCE = 1;
     const double distance = servoTargeting.targetPosition - servoTargeting.currentPosition;
-    if (std::abs(distance) <= ANGLE_TOLERANCE)
+    if (std::abs(distance) <= ANGLE_TOLERANCE) {
+      servosRequiringTargeting--;
       return;
+    }
     servoTargeting.currentPosition += servoTargeting.anglesPerTick * distance / std::abs(distance);
     Hardware::ServoUtil::moveTo(servoTargeting.servoData, servoTargeting.currentPosition);
   }
@@ -24,12 +32,15 @@ namespace Application::Hardware {
     auto &task = targetingData.servoController.getTask();
 
     while (true) {
+      auto servosRequiringTargeting = 3;
       for_each(
-              [](auto &x) {
-                controlServo(x);
+              [&](auto &x) {
+                controlServo(x, servosRequiringTargeting);
               },
               targetingData.servoTargetingTuple
       );
+      if (servosRequiringTargeting == 0)
+        OS::TaskUtils::suspend();
       task.clock(1);
     }
   }
@@ -84,6 +95,7 @@ namespace Application::Hardware {
       targeting.targetPosition = targetPosition;
       targeting.anglesPerTick = anglesPerSecond / OS::TaskTickRate;
     });
+    task.run();
   }
 
 }// namespace Application::Hardware

@@ -11,8 +11,15 @@ namespace Application::Hardware {
   struct ServoTargeting {
     const ServoData servoData{};
     double currentPosition{90};
-    double targetPosition{};
+    double targetPosition{90};
     double anglesPerTick{};
+  };
+
+  template<typename T>
+  concept IServoController = requires(T x) {
+    {
+      x.setTarget(std::declval<int>(), std::declval<double>(), std::declval<double>())
+    } -> std::same_as<void>;
   };
 
   template<Hardware::IServoData... ServoData>
@@ -36,7 +43,7 @@ namespace Application::Hardware {
   public:
     explicit ServoController(ServoData... servoData);
     void run();
-    auto &getTask() { return task; }
+    auto &getTask();
     void setTarget(int index, double targetPosition, double anglesPerSecond);
   };
 
