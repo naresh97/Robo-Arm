@@ -18,4 +18,8 @@ namespace Application::Hardware::ServoTypes {
     static constexpr DutyCycleRange dutyCycleRange{0.43 / 20.0, 2.4 / 20.0};
   };
 
+  struct DS3225 {
+    static constexpr DutyCycleRange dutyCycleRange{0.6 / 20.0, 2.5 / 20.0};
+  };
+
 }// namespace Application::Hardware::ServoTypes
